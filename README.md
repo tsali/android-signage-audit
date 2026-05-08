@@ -2,6 +2,8 @@
 
 A security audit tool for network administrators to identify exposed Android digital signage devices on their networks.
 
+**Blog post**: [The $30 Security Hole in Your Lobby](https://cultofjames.org/the-30-security-hole-in-your-lobby/) — the full story behind this tool.
+
 ## The Problem
 
 Cheap Android TV boxes are widely deployed as digital signage players in businesses — dance studios, restaurants, lobbies, churches, retail stores. These devices often ship with:
