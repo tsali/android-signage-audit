@@ -219,9 +219,11 @@ Network administrators — even good ones — often overlook IoT segmentation be
 - Nobody thinks of a signage box as an attack surface until it is one
 - If IoT devices didn't exist when the network was built, there's no IoT VLAN waiting for them
 
-In this case, the network was originally built with proper segmentation for the devices that existed at the time. The client later added signage boxes, smart TVs, Sonos speakers, and other IoT devices on their own — connecting them to the employee WiFi because that's the network they had the password to. By the time we audited, the employee VLAN had accumulated 8 IP cameras, an NVR, 6 Sonos speakers, 2 smart TVs, a signage box, and a print server — none of which were there when the network was designed.
+In this case, the network was originally built with proper segmentation. Security cameras were already on a dedicated VLAN — isolated so they can't reach anything outside their network. The employee VLAN can access the camera VLAN for viewing, but not the other way around. That part was done right from day one.
 
-**This is the most common scenario.** Networks don't start insecure — they drift there as clients add devices without involving their network engineer.
+What happened next: the client added signage boxes, smart TVs, Sonos speakers, and other IoT devices on their own — connecting them to the employee WiFi because that's the network they had the password to. Now the employee VLAN had a compromised signage box with root access sitting alongside devices that had firewall permissions to reach the camera network. A pivot from the signage box to any employee device to the camera VLAN is a three-hop attack that bypasses the camera isolation entirely.
+
+**This is the most common scenario.** Networks don't start insecure — they drift there as clients add devices without involving their network engineer. The segmentation you built only works if new devices go on the right VLAN.
 
 **Treat every IoT device as hostile until proven otherwise.** Segment first, ask questions later.
 
