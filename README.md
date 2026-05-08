@@ -168,6 +168,57 @@ python3 audit.py --host 192.168.1.50 --port 5556
 4. **Network segmentation** — signage devices should never share a VLAN with cameras, POS systems, or staff WiFi
 5. **Periodic audits** — run this tool monthly to catch new devices
 
+## IoT Security and VLAN Segmentation
+
+Digital signage boxes are IoT devices. So are smart TVs, IP cameras, Chromecast dongles, Sonos speakers, smart light bulbs, and every other "smart" device on your network. They all share the same problems:
+
+- Rarely updated firmware
+- Default or no credentials
+- Unnecessary services running (ADB, Telnet, UPnP)
+- No monitoring or alerting
+- Deployed and forgotten
+
+**The fundamental mistake is putting IoT devices on the same network as everything else.**
+
+When a signage box sits on the same VLAN as your security cameras, your NVR, your staff computers, and your POS system, a compromise of that $30 box is a compromise of your entire network. The attacker doesn't need to hack your firewall — they just need to hack the cheapest device on your WiFi.
+
+### Recommended VLAN Architecture for Small Business
+
+| VLAN | Purpose | Devices | Internet | Cross-VLAN Access |
+|------|---------|---------|----------|-------------------|
+| Management | Network infrastructure | Router, switches, APs, firewall | Yes | Admin only |
+| Staff | Employee devices | Laptops, phones, desktops | Yes | None |
+| Cameras | Surveillance | IP cameras, NVR | Limited (cloud upload only) | NVR only |
+| Signage/IoT | Smart devices | Signage boxes, smart TVs, speakers, Chromecast | Limited (content only) | None |
+| Guest | Public WiFi | Customer/visitor devices | Yes (throttled) | None |
+
+### Key Principles
+
+1. **IoT devices get their own VLAN.** Period. No exceptions. If it has firmware you can't audit, it goes on the IoT VLAN.
+
+2. **Default deny between VLANs.** An IoT device should never be able to reach your cameras, your POS, or your staff network. Create explicit firewall rules for the specific traffic that needs to cross (e.g., signage cloud sync on port 443 outbound only).
+
+3. **No inbound from IoT.** The IoT VLAN should not be able to initiate connections to any other VLAN. If you need to manage a signage box, connect FROM the management VLAN TO the device — not the other way around.
+
+4. **Restrict internet access.** Signage boxes need HTTPS to their cloud provider and nothing else. Block everything else outbound. A compromised signage box that can't call home to a C2 server is significantly less dangerous.
+
+5. **Monitor IoT VLANs separately.** Alert on unusual traffic — a signage box shouldn't be port scanning, making DNS requests to unusual domains, or transferring large amounts of data.
+
+6. **Inventory everything.** Know every device on every VLAN. If you can't name it, it shouldn't be there. Run periodic ARP scans and compare against your inventory.
+
+### Why This Gets Missed
+
+Network administrators — even good ones — often overlook IoT segmentation because:
+
+- The client says "it's just a TV" and it gets plugged into whatever switch port is closest
+- The signage vendor says "connect it to WiFi" with no security guidance
+- Small businesses don't have enterprise network gear (though UniFi and similar prosumer equipment makes VLANs accessible and affordable now)
+- Nobody thinks of a signage box as an attack surface until it is one
+
+The device we found in this audit was on the same VLAN as 8 IP cameras, an NVR, 6 Sonos speakers, 2 smart TVs, and a print server. One compromised signage box could have owned the entire surveillance system.
+
+**Treat every IoT device as hostile until proven otherwise.** Segment first, ask questions later.
+
 ## Responsible Disclosure
 
 This tool is for authorized network administrators auditing their own infrastructure. If you discover vulnerable devices on a network you manage, follow responsible disclosure:
