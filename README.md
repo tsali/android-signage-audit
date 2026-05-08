@@ -212,12 +212,16 @@ When a signage box sits on the same VLAN as your security cameras, your NVR, you
 
 Network administrators — even good ones — often overlook IoT segmentation because:
 
-- The client says "it's just a TV" and it gets plugged into whatever switch port is closest
+- The client adds devices AFTER the network is built — smart TVs, signage boxes, speakers get plugged in without telling the network engineer
+- The client says "it's just a TV" and connects it to whatever WiFi network they know the password to
 - The signage vendor says "connect it to WiFi" with no security guidance
 - Small businesses don't have enterprise network gear (though UniFi and similar prosumer equipment makes VLANs accessible and affordable now)
 - Nobody thinks of a signage box as an attack surface until it is one
+- If IoT devices didn't exist when the network was built, there's no IoT VLAN waiting for them
 
-The device we found in this audit was on the same VLAN as 8 IP cameras, an NVR, 6 Sonos speakers, 2 smart TVs, and a print server. One compromised signage box could have owned the entire surveillance system.
+In this case, the network was originally built with proper segmentation for the devices that existed at the time. The client later added signage boxes, smart TVs, Sonos speakers, and other IoT devices on their own — connecting them to the employee WiFi because that's the network they had the password to. By the time we audited, the employee VLAN had accumulated 8 IP cameras, an NVR, 6 Sonos speakers, 2 smart TVs, a signage box, and a print server — none of which were there when the network was designed.
+
+**This is the most common scenario.** Networks don't start insecure — they drift there as clients add devices without involving their network engineer.
 
 **Treat every IoT device as hostile until proven otherwise.** Segment first, ask questions later.
 
