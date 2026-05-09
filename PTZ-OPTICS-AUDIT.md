@@ -8,7 +8,7 @@ During a network security audit of a client's production facility (wrestling ven
 
 ## Environment
 
-- Flat network: 192.168.1.0/24 (no VLANs)
+- Flat network: 192.168.x.0/24 (no VLANs)
 - Router: Consumer-grade ASUS GT-AC5300
 - Cameras share the same network as NVR, production equipment (ATEM, VideoHub, X32 mixer), staff WiFi, and audience WiFi during events
 - No network segmentation between production equipment and public WiFi
@@ -17,8 +17,8 @@ During a network security audit of a client's production facility (wrestling ven
 
 | Camera | IP | Model | Firmware | Serial |
 |--------|-----|-------|----------|--------|
-| PTZ 1 | 192.168.1.11 | F64.HI | SOC v9.1.24 | f1i07070121 |
-| PTZ 2 | 192.168.1.12 | F64.HI | SOC v9.1.24 | (similar) |
+| PTZ 1 | 192.168.x.y | F64.HI | SOC v9.1.24 | [REDACTED] |
+| PTZ 2 | 192.168.x.z | F64.HI | SOC v9.1.24 | (similar) |
 
 MAC prefix: DC:ED:84 (both cameras, sequential MACs)
 
@@ -66,7 +66,7 @@ rtsp_auth_en="0"
 
 The RTSP video feed is accessible without credentials:
 ```
-rtsp://192.168.1.11:554/
+rtsp://192.168.x.y:554/
 ```
 
 Anyone on the network — including audience members connected to the venue WiFi during events — can view the live camera feed.
@@ -122,8 +122,8 @@ An attacker on the network can:
 ### 3. Pivot to Production Network
 With SSH access (CVE-2025-35451), an attacker gains root on the camera's Linux OS. From there:
 - Scan the internal network for other vulnerable devices
-- Access the NVR (192.168.1.19) which has RDP (3389) open
-- Access the EVO SNS NAS (192.168.1.25) via SMB
+- Access the NVR (192.168.x.a) which has RDP (3389) open
+- Access the EVO SNS NAS (192.168.x.b) via SMB
 - Intercept ATEM switcher, VideoHub, or X32 mixer traffic
 - Install persistent backdoors
 
