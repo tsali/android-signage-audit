@@ -245,3 +245,40 @@ Built by Amy 3.0 for RAI during a real-world network audit. Pensacola, FL.
 ## License
 
 MIT
+
+## PTZOptics Camera Findings
+
+During the same audit that discovered the signage device vulnerability, two PTZOptics F64.HI cameras (firmware SOC v9.1.24) were found with multiple critical issues:
+
+### Confirmed Vulnerabilities
+- **CVE-2024-8956 (Auth Bypass)** — Camera CGI endpoints return full device configuration without any authentication, including network settings, streaming keys, and SRT passwords in plaintext
+- **RTSP authentication disabled** — Live camera feeds accessible to anyone on the network
+- **ONVIF authentication disabled** — Full pan/tilt/zoom control without credentials. We physically moved a camera to preset 1 without any password
+- **ADB port 5555 exposed** — Android Debug Bridge open on the network (requires key authorization)
+- **SSH port 22 open** — With legacy ciphers (ssh-rsa, ssh-dss) and hardcoded credentials per CVE-2025-35451 (CVSS 9.8)
+
+### SSH Brute Force Results
+We conducted a targeted brute force against the SSH service using 1,374 passwords from combined sources (SecLists best1050, default credentials databases, and a custom IoT/camera/manufacturer-specific wordlist) across root, admin, and service users.
+
+**Result: No credentials found on firmware SOC v9.1.24.** The hardcoded password referenced in CVE-2025-35451 is not present in common wordlists. However, the SSH port remains open with a password that cannot be changed or disabled by the user. This leaves the device vulnerable to larger-scale brute force attacks or credential extraction via firmware analysis.
+
+### Impact
+These are $1,500+ professional broadcast cameras on a flat network shared with audience WiFi during live events. Any attendee can:
+- View all camera feeds without credentials
+- Control camera movement without credentials
+- Dump the full network configuration without credentials
+- Attempt SSH brute force against the hardcoded credentials
+
+### Recommendations
+1. Update firmware immediately — check [PTZOptics Known Vulnerabilities](https://ptzoptics.com/known-vulnerabilities-and-fixes/)
+2. Enable RTSP and ONVIF authentication
+3. Isolate cameras on a dedicated production VLAN
+4. Block SSH (22) and ADB (5555) at the network level if not needed for management
+
+### References
+- [CVE-2024-8956 — Authentication Bypass](https://nvd.nist.gov/vuln/detail/CVE-2024-8956)
+- [CVE-2025-35451 — Hardcoded SSH Credentials (CVSS 9.8)](https://nvd.nist.gov/vuln/detail/CVE-2025-35451)
+- [CISA Advisory ICSA-25-162-10](https://www.cisa.gov/news-events/ics-advisories/icsa-25-162-10)
+- [GreyNoise Zero-Day Discovery](https://www.greynoise.io/blog/greynoise-intelligence-discovers-zero-day-vulnerabilities-in-live-streaming-cameras-with-the-help-of-ai)
+- [ZeroPath CVE-2025-35451 Analysis](https://zeropath.com/blog/cve-2025-35451-ptzoptics-valuehd-hardcoded-credentials)
+- [PTZOptics Known Vulnerabilities & Fixes](https://ptzoptics.com/known-vulnerabilities-and-fixes/)
